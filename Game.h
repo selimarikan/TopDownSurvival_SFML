@@ -24,7 +24,6 @@ public:
 	bool RemoveObject(int id);
 	void Run();
 
-    TextureManager m_TextureMgr;
     CharacterTopDown* m_pPlayer;
 
 private:
@@ -36,8 +35,13 @@ private:
 	void Render(float dt);
 	void LoadTextures();
 
+    TextureManager m_TextureMgr;
+
 	std::list<ITile*> m_Tiles;
 
+    unsigned int m_TileSize = 32;
+    unsigned int m_MapWidth = 1000;
+    unsigned int m_MapHeight = 1000;
 	std::filesystem::path m_AssetsDir;
 };
 

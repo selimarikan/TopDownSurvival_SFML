@@ -20,6 +20,39 @@ Game::Game(const std::filesystem::path& assetsDir): m_AssetsDir(assetsDir)
 
     LoadTextures();
 
+    Map map = Map(m_MapWidth, m_MapHeight, m_TileSize);
+    std::vector<sf::Texture*> grassTextures;
+    grassTextures.emplace_back(m_TextureMgr.GetTexture("grass01"));
+    grassTextures.emplace_back(m_TextureMgr.GetTexture("grass02"));
+    grassTextures.emplace_back(m_TextureMgr.GetTexture("grass03"));
+    //grassTextures.emplace_back(game.m_TextureMgr.GetTexture("dirt"));
+    map.AddTexture("grass", grassTextures);
+    //Animation grassAnim = Animation(0, 3, 2.0f);
+
+    
+
+    std::vector<sf::Texture*> wheatTextures;
+    wheatTextures.emplace_back(m_TextureMgr.GetTexture("wheat_stage1"));
+    wheatTextures.emplace_back(m_TextureMgr.GetTexture("wheat_stage2"));
+    wheatTextures.emplace_back(m_TextureMgr.GetTexture("wheat_stage3"));
+    wheatTextures.emplace_back(m_TextureMgr.GetTexture("wheat_stage4"));
+    map.AddTexture("wheat", wheatTextures);
+
+    std::vector<sf::Texture*> rockTextures;
+    rockTextures.emplace_back(m_TextureMgr.GetTexture("rock"));
+    rockTextures.emplace_back(m_TextureMgr.GetTexture("rock_moss"));
+    map.AddTexture("rock", rockTextures);
+
+    map.Build();
+
+    // Add tiles to the list so it gets rendered
+    for (auto& tile: map.GetTiles())
+    {
+        AddObject(tile);
+    }
+    
+
+
     // m_pPlayer = new Character(sf::Vector2f(32.0f, 32.0f), 
     //     m_TextureMgr.GetTexture("c1_stand_left01"), 
     //     m_TextureMgr.GetTexture("c1_stand_up01"), 
@@ -45,6 +78,9 @@ Game::Game(const std::filesystem::path& assetsDir): m_AssetsDir(assetsDir)
     // m_pPlayer->AddAnim(upAnim);
     // m_pPlayer->AddAnim(rightAnim);
     // m_pPlayer->AddAnim(downAnim);
+
+    AddObject(m_pPlayer); //, "ThePlayer"
+
 }
 
 void Game::Run()
@@ -155,7 +191,21 @@ void Game::HandleEvents()
             }
             case sf::Event::MouseButtonPressed:
             {
-                
+                if (event.mouseButton.button == sf::Mouse::Left)
+                {
+                    // std::vector<sf::Texture*> textures;
+                    // textures.emplace_back(m_TextureMgr.GetTexture("dot"));
+                    // Tile tile = Tile(sf::Vector2f(16, 16), textures, 255);
+                    // m_Tiles.emplace_back(tile);
+                }
+                else if (event.mouseButton.button == sf::Mouse::Right)
+                {
+                    
+                }
+                else
+                {
+
+                }
                 break;
             }
             /*case sf::Event::MouseWheelScrolled:
