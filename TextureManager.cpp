@@ -4,8 +4,8 @@ void TextureManager::LoadTexture(const std::string& name, const std::string& fil
 {
     sf::Texture* pTex = new sf::Texture();
     pTex->loadFromFile(filename);
-	
-	m_Textures[name] = pTex;
+    
+    m_Textures[name] = pTex;
 }
 
 void TextureManager::LoadSheet(const std::string& name, const std::string& filename, int n_cols, int sprite_count, float single_width, float single_height)

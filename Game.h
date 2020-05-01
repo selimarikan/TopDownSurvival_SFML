@@ -19,29 +19,30 @@ class Game
 {
 public:
 
-	Game(const std::filesystem::path& assetsDir);
-    bool AddObject(ITile* pObj);
-	bool RemoveObject(int id);
-	void Run();
+    Game(const std::filesystem::path& assetsDir);
+    void Run();
+    
 
-    CharacterTopDown* m_pPlayer;
 
 private:
-	sf::RenderWindow m_Window;
-	sf::View m_GameView;
-	sf::View m_GUIView;
+    sf::RenderWindow m_Window;
+    sf::View m_GameView;
+    sf::View m_GUIView;
 
-	void HandleEvents();
-	void Render(float dt);
-	void LoadTextures();
-
+    void HandleEvents();
+    void Render(float dt);
+    void LoadTextures();
+    bool AddObject(ITile* pObj);
+    bool RemoveObject(int id);
     TextureManager m_TextureMgr;
+    CharacterTopDown* m_pPlayer;
 
-	std::list<ITile*> m_Tiles;
+
+    std::list<ITile*> m_Tiles;
 
     unsigned int m_TileSize = 32;
     unsigned int m_MapWidth = 1000;
     unsigned int m_MapHeight = 1000;
-	std::filesystem::path m_AssetsDir;
+    std::filesystem::path m_AssetsDir;
 };
 

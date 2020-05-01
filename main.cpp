@@ -16,9 +16,9 @@ int main()
     configFile >> config;
 
     std::filesystem::path assetsPath = "Assets/";
-	Game game(assetsPath);
+    Game game(assetsPath);
     
-	game.Run();
+    game.Run();
 
-	return 0;
+    return 0;
 }
