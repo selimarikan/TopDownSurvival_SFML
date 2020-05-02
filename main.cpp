@@ -17,7 +17,7 @@ int main()
 
     std::filesystem::path assetsPath = "Assets/";
     Game game(assetsPath);
-    
+
     game.Run();
 
     return 0;

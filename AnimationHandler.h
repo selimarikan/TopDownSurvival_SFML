@@ -34,16 +34,16 @@ private:
     int m_CurrentFrame;
 
 public:
-    void AddAnim(Animation& anim);
+    void AddAnim(Animation &anim);
 
-    // Update the current frame of animation. dt is the time since 
+    // Update the current frame of animation. dt is the time since
     // the update was last called (time for one frame to be executed).
     int Update(const float dt);
 
     // Change the animation, resetting t in the process.
     void ChangeAnim(unsigned int animNum);
 
-    int GetAnimCount() 
+    int GetAnimCount()
     {
         return m_Animations.size();
     }
@@ -52,4 +52,3 @@ public:
     {
     }
 };
-

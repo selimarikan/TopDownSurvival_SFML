@@ -1,17 +1,17 @@
 #include "CharacterTopDown.h"
 
-void CharacterTopDown::SetPosition(const sf::Vector2f& pos)
+void CharacterTopDown::SetPosition(const sf::Vector2f &pos)
 {
     m_Shape.setPosition(pos);
 }
 
-void CharacterTopDown::AddAnim(Animation& anim)
+void CharacterTopDown::AddAnim(Animation &anim)
 {
     m_AnimHandler.AddAnim(anim);
 }
 
 // Sets the correct sprite from the animation result and returns the shape to be rendered
-sf::RectangleShape* CharacterTopDown::Get(float dt)
+sf::RectangleShape *CharacterTopDown::Get(float dt)
 {
     int frame = m_AnimHandler.Update(dt);
     // int spriteIndex = ((int)m_CurrentDirection * 2) + frame;
@@ -43,7 +43,7 @@ void CharacterTopDown::Turn(float deg)
 void CharacterTopDown::Move(MapDirection dir)
 {
     sf::Vector2f dist;
-    // Every direction has 2 sprites, use 
+    // Every direction has 2 sprites, use
     // int sprIndex = ((int)dir) * 2;
 
     if (dir == MapDirection::LEFT)

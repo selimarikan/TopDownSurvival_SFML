@@ -4,15 +4,14 @@
 
 #define TILE_SIZE 32
 
-
 // TODO: Create map editor from txt file
 // TODO: Move map/view when close to the edges
 // TODO: Create "options" class
-Game::Game(const std::filesystem::path& assetsDir): m_AssetsDir(assetsDir)
+Game::Game(const std::filesystem::path &assetsDir) : m_AssetsDir(assetsDir)
 {
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
-    
+
     m_Window.create(sf::VideoMode(800, 600), "TDDEF", sf::Style::Default, settings);
     m_Window.setVerticalSyncEnabled(false);
     m_Window.setFramerateLimit(MAX_FRAMES);
@@ -21,7 +20,7 @@ Game::Game(const std::filesystem::path& assetsDir): m_AssetsDir(assetsDir)
     LoadTextures();
 
     Map map = Map(m_MapWidth, m_MapHeight, m_TileSize);
-    std::vector<sf::Texture*> grassTextures;
+    std::vector<sf::Texture *> grassTextures;
     grassTextures.emplace_back(m_TextureMgr.GetTexture("grass01"));
     grassTextures.emplace_back(m_TextureMgr.GetTexture("grass02"));
     grassTextures.emplace_back(m_TextureMgr.GetTexture("grass03"));
@@ -29,16 +28,14 @@ Game::Game(const std::filesystem::path& assetsDir): m_AssetsDir(assetsDir)
     map.AddTexture("grass", grassTextures);
     //Animation grassAnim = Animation(0, 3, 2.0f);
 
-    
-
-    std::vector<sf::Texture*> wheatTextures;
+    std::vector<sf::Texture *> wheatTextures;
     wheatTextures.emplace_back(m_TextureMgr.GetTexture("wheat_stage1"));
     wheatTextures.emplace_back(m_TextureMgr.GetTexture("wheat_stage2"));
     wheatTextures.emplace_back(m_TextureMgr.GetTexture("wheat_stage3"));
     wheatTextures.emplace_back(m_TextureMgr.GetTexture("wheat_stage4"));
     map.AddTexture("wheat", wheatTextures);
 
-    std::vector<sf::Texture*> rockTextures;
+    std::vector<sf::Texture *> rockTextures;
     rockTextures.emplace_back(m_TextureMgr.GetTexture("rock"));
     rockTextures.emplace_back(m_TextureMgr.GetTexture("rock_moss"));
     map.AddTexture("rock", rockTextures);
@@ -46,17 +43,15 @@ Game::Game(const std::filesystem::path& assetsDir): m_AssetsDir(assetsDir)
     map.Build();
 
     // Add tiles to the list so it gets rendered
-    for (auto& tile: map.GetTiles())
+    for (auto &tile : map.GetTiles())
     {
         AddObject(tile);
     }
-    
 
-
-    // m_pPlayer = new Character(sf::Vector2f(32.0f, 32.0f), 
-    //     m_TextureMgr.GetTexture("c1_stand_left01"), 
-    //     m_TextureMgr.GetTexture("c1_stand_up01"), 
-    //     m_TextureMgr.GetTexture("c1_stand_right01"), 
+    // m_pPlayer = new Character(sf::Vector2f(32.0f, 32.0f),
+    //     m_TextureMgr.GetTexture("c1_stand_left01"),
+    //     m_TextureMgr.GetTexture("c1_stand_up01"),
+    //     m_TextureMgr.GetTexture("c1_stand_right01"),
     //     m_TextureMgr.GetTexture("c1_stand_down01"),
     //     m_TextureMgr.GetTexture("c1_move_left01"),
     //     m_TextureMgr.GetTexture("c1_move_left02"),
@@ -80,7 +75,6 @@ Game::Game(const std::filesystem::path& assetsDir): m_AssetsDir(assetsDir)
     // m_pPlayer->AddAnim(downAnim);
 
     AddObject(m_pPlayer); //, "ThePlayer"
-
 }
 
 void Game::Run()
@@ -89,7 +83,7 @@ void Game::Run()
 
     // Sort sprites once by their ZLevel.
     //   This may be needed per render or maybe per level load
-    m_Tiles.sort([](ITile* tile1, ITile* tile2) { return tile1->ZLevel < tile2->ZLevel; });
+    m_Tiles.sort([](ITile *tile1, ITile *tile2) { return tile1->ZLevel < tile2->ZLevel; });
 
     while (m_Window.isOpen())
     {
@@ -111,104 +105,101 @@ void Game::HandleEvents()
     {
         switch (event.type)
         {
-            case sf::Event::Closed:
+        case sf::Event::Closed:
+        {
+            m_Window.close();
+            break;
+        }
+        case sf::Event::Resized:
+        {
+            m_GameView.setSize(event.size.width, event.size.height);
+            m_GameView.setCenter(event.size.width / 2.0f, event.size.height / 2.0f);
+            break;
+        }
+        case sf::Event::KeyPressed:
+        {
+            if (event.key.code == sf::Keyboard::Escape)
             {
                 m_Window.close();
-                break;
             }
-            case sf::Event::Resized:
+            else if (event.key.code == sf::Keyboard::Right)
             {
-                m_GameView.setSize(event.size.width, event.size.height);
-                m_GameView.setCenter(event.size.width / 2.0f, event.size.height / 2.0f);
-                break;
+                const sf::Vector2f centerPt = m_GameView.getCenter();
+                m_GameView.setCenter(centerPt.x + TILE_SIZE, centerPt.y);
             }
-            case sf::Event::KeyPressed:
+            else if (event.key.code == sf::Keyboard::Left)
             {
-                if (event.key.code == sf::Keyboard::Escape)
-                {
-                    m_Window.close();
-                }
-                else if (event.key.code == sf::Keyboard::Right)
-                {
-                    const sf::Vector2f centerPt = m_GameView.getCenter();
-                    m_GameView.setCenter(centerPt.x + TILE_SIZE, centerPt.y);
-                }
-                else if (event.key.code == sf::Keyboard::Left)
-                {
-                    const sf::Vector2f centerPt = m_GameView.getCenter();
-                    m_GameView.setCenter(centerPt.x - TILE_SIZE, centerPt.y);
-                }
-                else if (event.key.code == sf::Keyboard::Up)
-                {
-                    const sf::Vector2f centerPt = m_GameView.getCenter();
-                    m_GameView.setCenter(centerPt.x, centerPt.y - TILE_SIZE);
-                }
-                else if (event.key.code == sf::Keyboard::Down)
-                {
-                    const sf::Vector2f centerPt = m_GameView.getCenter();
-                    m_GameView.setCenter(centerPt.x, centerPt.y + TILE_SIZE);
-                    
-                }
-                else if (event.key.code == sf::Keyboard::W)
-                {
-                    // m_pPlayer->Turn(MapDirection::UP);
-                    m_pPlayer->Move(MapDirection::UP);
-                }
-                else if (event.key.code == sf::Keyboard::S)
-                {
-                    // m_pPlayer->Turn(MapDirection::DOWN);
-                    m_pPlayer->Move(MapDirection::DOWN);
-                }
-                else if (event.key.code == sf::Keyboard::A)
-                {
-                    // m_pPlayer->Turn(MapDirection::LEFT);
-                    m_pPlayer->Move(MapDirection::LEFT);
-                }
-                else if (event.key.code == sf::Keyboard::D)
-                {
-                    // m_pPlayer->Turn(MapDirection::RIGHT);
-                    m_pPlayer->Move(MapDirection::RIGHT);
-                }
-                break;
+                const sf::Vector2f centerPt = m_GameView.getCenter();
+                m_GameView.setCenter(centerPt.x - TILE_SIZE, centerPt.y);
             }
-            // TL origin, gives coordinates in screen pixels, non-normalized
-            case sf::Event::MouseMoved:
+            else if (event.key.code == sf::Keyboard::Up)
             {
-                // Get the positions and calc the difference vector
-                auto mousePos = m_Window.mapPixelToCoords(sf::Mouse::getPosition(m_Window));
-                auto playerPos = m_pPlayer->GetPosition();
-                auto delta = mousePos - playerPos;
-                
-                // std::cout << "Mx: " << event.mouseMove.x << " My: " << event.mouseMove.y << std::endl;
-                // std::cout << "PlayerX: " << playerPos.x << " PlayerY: " << playerPos.y << std::endl;
-                float rotRad = atan2f(delta.y, delta.x);
-                float rotDeg = (rotRad * 180.0f) / 3.141592f;
+                const sf::Vector2f centerPt = m_GameView.getCenter();
+                m_GameView.setCenter(centerPt.x, centerPt.y - TILE_SIZE);
+            }
+            else if (event.key.code == sf::Keyboard::Down)
+            {
+                const sf::Vector2f centerPt = m_GameView.getCenter();
+                m_GameView.setCenter(centerPt.x, centerPt.y + TILE_SIZE);
+            }
+            else if (event.key.code == sf::Keyboard::W)
+            {
+                // m_pPlayer->Turn(MapDirection::UP);
+                m_pPlayer->Move(MapDirection::UP);
+            }
+            else if (event.key.code == sf::Keyboard::S)
+            {
+                // m_pPlayer->Turn(MapDirection::DOWN);
+                m_pPlayer->Move(MapDirection::DOWN);
+            }
+            else if (event.key.code == sf::Keyboard::A)
+            {
+                // m_pPlayer->Turn(MapDirection::LEFT);
+                m_pPlayer->Move(MapDirection::LEFT);
+            }
+            else if (event.key.code == sf::Keyboard::D)
+            {
+                // m_pPlayer->Turn(MapDirection::RIGHT);
+                m_pPlayer->Move(MapDirection::RIGHT);
+            }
+            break;
+        }
+        // TL origin, gives coordinates in screen pixels, non-normalized
+        case sf::Event::MouseMoved:
+        {
+            // Get the positions and calc the difference vector
+            auto mousePos = m_Window.mapPixelToCoords(sf::Mouse::getPosition(m_Window));
+            auto playerPos = m_pPlayer->GetPosition();
+            auto delta = mousePos - playerPos;
 
-                // std::cout << "rotRad: " << rotRad << " rotDeg: " << rotDeg << std::endl;
+            // std::cout << "Mx: " << event.mouseMove.x << " My: " << event.mouseMove.y << std::endl;
+            // std::cout << "PlayerX: " << playerPos.x << " PlayerY: " << playerPos.y << std::endl;
+            float rotRad = atan2f(delta.y, delta.x);
+            float rotDeg = (rotRad * 180.0f) / 3.141592f;
 
-                m_pPlayer->SetRotation(rotDeg);
-                break;
-            }
-            case sf::Event::MouseButtonPressed:
+            // std::cout << "rotRad: " << rotRad << " rotDeg: " << rotDeg << std::endl;
+
+            m_pPlayer->SetRotation(rotDeg);
+            break;
+        }
+        case sf::Event::MouseButtonPressed:
+        {
+            if (event.mouseButton.button == sf::Mouse::Left)
             {
-                if (event.mouseButton.button == sf::Mouse::Left)
-                {
-                    // std::vector<sf::Texture*> textures;
-                    // textures.emplace_back(m_TextureMgr.GetTexture("dot"));
-                    // Tile tile = Tile(sf::Vector2f(16, 16), textures, 255);
-                    // m_Tiles.emplace_back(tile);
-                }
-                else if (event.mouseButton.button == sf::Mouse::Right)
-                {
-                    
-                }
-                else
-                {
-
-                }
-                break;
+                // std::vector<sf::Texture*> textures;
+                // textures.emplace_back(m_TextureMgr.GetTexture("dot"));
+                // Tile tile = Tile(sf::Vector2f(16, 16), textures, 255);
+                // m_Tiles.emplace_back(tile);
             }
-            /*case sf::Event::MouseWheelScrolled:
+            else if (event.mouseButton.button == sf::Mouse::Right)
+            {
+            }
+            else
+            {
+            }
+            break;
+        }
+        /*case sf::Event::MouseWheelScrolled:
             {
                 if (event.mouseWheelScroll.wheel == sf::Mouse::VerticalWheel)
                 {
@@ -219,8 +210,8 @@ void Game::HandleEvents()
                 }
                 break;
             }*/
-            default:
-                break;
+        default:
+            break;
         }
     }
 }
@@ -240,7 +231,7 @@ void Game::Render(float dt)
 }
 
 // Checks if the texture is a strip by checking the name, returns the strip length for slice
-bool IsTextureStrip(const std::filesystem::path& texturePath, int& splitLen)
+bool IsTextureStrip(const std::filesystem::path &texturePath, int &splitLen)
 {
     auto pathVec = TDDEF::Utils::Split(texturePath.filename().stem().string(), '_');
     std::string stripStr = "strip";
@@ -255,10 +246,10 @@ void Game::LoadTextures()
     // Load characters
     // TODO: Test tile loading
     std::filesystem::path charDir = m_AssetsDir / "characters";
-    for (const auto& entry : std::filesystem::directory_iterator(charDir))
+    for (const auto &entry : std::filesystem::directory_iterator(charDir))
     {
         std::filesystem::path path = entry.path();
-        
+
         int splitLen = 0;
         if (IsTextureStrip(path, splitLen))
         {
@@ -268,14 +259,14 @@ void Game::LoadTextures()
         {
             m_TextureMgr.LoadTexture(path.filename().stem().string(), path.string());
         }
-            
+
         std::cout << "Loading texture: " << path.filename().stem() << std::endl; //DBG
     }
 
     // Load all the tiles
     // TODO: Add tile support
     std::filesystem::path tilesDir = m_AssetsDir / "tiles/";
-    for (const auto& entry : std::filesystem::directory_iterator(tilesDir))
+    for (const auto &entry : std::filesystem::directory_iterator(tilesDir))
     {
         std::filesystem::path path = entry.path();
         m_TextureMgr.LoadTexture(path.filename().stem().string(), path.string());
@@ -285,7 +276,7 @@ void Game::LoadTextures()
     std::cout << "Loaded textures.\n";
 }
 
-bool Game::AddObject(ITile* pObj)
+bool Game::AddObject(ITile *pObj)
 {
     m_Tiles.emplace_back(pObj);
     return true;

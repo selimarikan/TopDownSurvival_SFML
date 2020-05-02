@@ -1,7 +1,7 @@
 #include "AnimationHandler.h"
 #include <iostream>
 
-void AnimationHandler::AddAnim(Animation& anim)
+void AnimationHandler::AddAnim(Animation &anim)
 {
     m_Animations.push_back(anim);
 }
